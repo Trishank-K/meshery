@@ -634,6 +634,7 @@ class Navigator_ extends React.Component {
   }
 
   createNavigatorComponents(capabilityRegistryObj) {
+    console.log('CAPS: ', capabilityRegistryObj);
     return getNavigatorComponents(capabilityRegistryObj);
   }
 

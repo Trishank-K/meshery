@@ -230,7 +230,6 @@ const ValidationResults = withStyles(styles)(ValidationResults_);
 export const ValidateDesign = ({ design, currentNodeId, validationMachine }) => {
   const validationResults = useDesignSchemaValidationResults(validationMachine);
   const isValidating = useIsValidatingDesignSchema(validationMachine);
-
   const designName = design.name;
   const { configurableComponents, annotationComponents } = processDesign(design);
 

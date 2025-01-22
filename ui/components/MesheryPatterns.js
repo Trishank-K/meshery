@@ -101,6 +101,7 @@ import PatternConfigureIcon from '@/assets/icons/PatternConfigure';
 import { useGetProviderCapabilitiesQuery } from '@/rtk-query/user';
 import TooltipButton from '@/utils/TooltipButton';
 import { ToolWrapper } from './Lifecycle/Workspaces';
+import { designValidatorCommands } from 'machines/validator/designValidator';
 
 const genericClickHandler = (ev, fn) => {
   ev.stopPropagation();
@@ -632,13 +633,15 @@ function MesheryPatterns({
   const openUndeployModal = (e, pattern_file, name) => {
     e.stopPropagation();
     const design = parseDesignFile(pattern_file);
+    const validationMachine = designValidationActorRef;
+
     designLifecycleModal.openModal({
       title: `Undeploy design "${name}"`,
       headerIcon: <UndeployIcon fill="#fff" height={'2rem'} width={'2rem'} />,
       reactNode: (
         <UnDeployStepper
           handleClose={designLifecycleModal.closeModal}
-          validationMachine={designValidationActorRef}
+          validationMachine={validationMachine}
           design={design}
           handleUndeploy={handleUndeploy}
           deployment_type={DEPLOYMENT_TYPE.UNDEPLOY}
@@ -648,46 +651,69 @@ function MesheryPatterns({
     });
   };
 
-  const openDryRunModal = (e, pattern_file, name) => {
+  const openDryRunModal = (e, pattern_file, name, id, openModal = false) => {
     e.stopPropagation();
 
     const design = parseDesignFile(pattern_file);
-    designLifecycleModal.openModal({
-      title: `Dryrun design "${name}"`,
-      headerIcon: <DryRunIcon fill="#fff" height={'2rem'} width={'2rem'} />,
-      reactNode: (
-        <ModalBody style={{ minWidth: '30rem', width: 'auto' }}>
-          <DryRunDesign
-            handleClose={designLifecycleModal.closeModal}
-            validationMachine={designValidationActorRef}
-            design={design}
-            deployment_type={DEPLOYMENT_TYPE.DEPLOY}
-            selectedK8sContexts={selectedK8sContexts}
-          />
-        </ModalBody>
-      ),
-    });
+    const validationMachine = designValidationActorRef;
+
+    if (!openModal) {
+      const dryRunCommand =
+        DEPLOYMENT_TYPE.DEPLOY === DEPLOYMENT_TYPE.DEPLOY
+          ? designValidatorCommands.dryRunDesignDeployment
+          : designValidatorCommands.dryRunDesignUnDeployment;
+
+      validationMachine.send(
+        dryRunCommand({
+          design,
+          k8sContexts: selectedK8sContexts,
+          includeDependencies: true,
+        }),
+      );
+    } else {
+      designLifecycleModal.openModal({
+        title: `Dryrun design "${name}"`,
+        headerIcon: <DryRunIcon fill="#fff" height={'2rem'} width={'2rem'} />,
+        reactNode: (
+          <ModalBody style={{ minWidth: '30rem', width: 'auto' }}>
+            <DryRunDesign
+              handleClose={designLifecycleModal.closeModal}
+              validationMachine={validationMachine}
+              design={design}
+              deployment_type={DEPLOYMENT_TYPE.DEPLOY}
+              selectedK8sContexts={selectedK8sContexts}
+            />
+          </ModalBody>
+        ),
+      });
+    }
   };
 
-  const openValidateModal = (e, pattern_file, name) => {
+  const openValidateModal = (e, pattern_file, name, id, openModal = false) => {
     e.stopPropagation();
 
     const design = parseDesignFile(pattern_file);
-    designLifecycleModal.openModal({
-      title: `Validate design "${name}"`,
-      headerIcon: <CheckIcon fill="#fff" height={'2rem'} width={'2rem'} />,
-      reactNode: (
-        <ModalBody style={{ minWidth: '30rem', width: 'auto' }}>
-          <ValidateDesign
-            handleClose={designLifecycleModal.closeModal}
-            validationMachine={designValidationActorRef}
-            design={design}
-            deployment_type={DEPLOYMENT_TYPE.DEPLOY}
-            selectedK8sContexts={selectedK8sContexts}
-          />
-        </ModalBody>
-      ),
-    });
+    const validationMachine = designValidationActorRef;
+
+    if (!openModal) {
+      validationMachine.send(designValidatorCommands.validateDesignSchema({ design }));
+    } else {
+      designLifecycleModal.openModal({
+        title: `Validate design "${name}"`,
+        headerIcon: <CheckIcon fill="#fff" height={'2rem'} width={'2rem'} />,
+        reactNode: (
+          <ModalBody style={{ minWidth: '30rem', width: 'auto' }}>
+            <ValidateDesign
+              handleClose={designLifecycleModal.closeModal}
+              validationMachine={validationMachine}
+              design={design}
+              deployment_type={DEPLOYMENT_TYPE.DEPLOY}
+              selectedK8sContexts={selectedK8sContexts}
+            />
+          </ModalBody>
+        ),
+      });
+    }
   };
 
   const handleUploadImport = () => {

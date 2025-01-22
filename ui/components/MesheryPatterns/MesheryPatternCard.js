@@ -63,9 +63,9 @@ function MesheryPatternCard_({
 }) {
   const router = useRouter();
 
-  const genericClickHandler = (ev, fn) => {
+  const genericClickHandler = (ev, fn, openModal = false) => {
     ev.stopPropagation();
-    fn(ev);
+    fn(ev, openModal);
   };
   const [gridProps, setGridProps] = useState(INITIAL_GRID_SIZE);
   const [fullScreen, setFullScreen] = useState(false);
@@ -187,30 +187,33 @@ function MesheryPatternCard_({
                 </TooltipButton>
               )}
               <ActionButton
-                defaultActionClick={(e) => genericClickHandler(e, handleVerify)}
                 options={[
                   {
                     label: 'Validate',
                     icon: <CheckIcon className={classes.iconPatt} />,
-                    onClick: (e) => genericClickHandler(e, handleVerify),
+                    onClick: (e, index, openModal) =>
+                      genericClickHandler(e, handleVerify, openModal),
                     disabled: !CAN(keys.VALIDATE_DESIGN.action, keys.VALIDATE_DESIGN.subject),
                   },
                   {
                     label: 'Dry Run',
                     icon: <DryRunIcon className={classes.iconPatt} />,
-                    onClick: (e) => genericClickHandler(e, handleDryRun),
+                    onClick: (e, index, openModal) =>
+                      genericClickHandler(e, handleDryRun, openModal),
                     disabled: !CAN(keys.VALIDATE_DESIGN.action, keys.VALIDATE_DESIGN.subject),
                   },
                   {
                     label: 'Deploy',
                     icon: <DoneAllIcon className={classes.iconPatt} />,
-                    onClick: (e) => genericClickHandler(e, handleDeploy),
+                    onClick: (e, index, openModal) =>
+                      genericClickHandler(e, handleDeploy, openModal),
                     disabled: !CAN(keys.DEPLOY_DESIGN.action, keys.DEPLOY_DESIGN.subject),
                   },
                   {
                     label: 'Undeploy',
                     icon: <UndeployIcon fill={'currentColor'} className={classes.iconPatt} />,
-                    onClick: (e) => genericClickHandler(e, handleUnDeploy),
+                    onClick: (e, index, openModal) =>
+                      genericClickHandler(e, handleUnDeploy, openModal),
                     disabled: !CAN(keys.DEPLOY_DESIGN.action, keys.DEPLOY_DESIGN.subject),
                   },
                 ]}

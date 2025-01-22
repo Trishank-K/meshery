@@ -212,17 +212,17 @@ function MesheryPatternGrid({
               user={user}
               pattern={pattern}
               handleClone={() => handleClone(pattern.id, pattern.name)}
-              handleDeploy={(e) => {
-                openDeployModal(e, pattern.pattern_file, pattern.name, pattern.id);
+              handleDeploy={(e, openModal) => {
+                openDeployModal(e, pattern.pattern_file, pattern.name, pattern.id, openModal);
               }}
-              handleUnDeploy={(e) => {
-                openUndeployModal(e, pattern.pattern_file, pattern.name, pattern.id);
+              handleUnDeploy={(e, openModal) => {
+                openUndeployModal(e, pattern.pattern_file, pattern.name, pattern.id, openModal);
               }}
-              handleDryRun={(e) =>
-                openDryRunModal(e, pattern.pattern_file, pattern.name, pattern.id)
+              handleDryRun={(e, openModal) =>
+                openDryRunModal(e, pattern.pattern_file, pattern.name, pattern.id, openModal)
               }
-              handleVerify={(e) =>
-                openValidationModal(e, pattern.pattern_file, pattern.name, pattern.id)
+              handleVerify={(e, openModal) =>
+                openValidationModal(e, pattern.pattern_file, pattern.name, pattern.id, openModal)
               }
               handlePublishModal={() => handlePublishModal(pattern)}
               handleUnpublishModal={(e) => handleUnpublishModal(e, pattern)()}
